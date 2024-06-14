@@ -2,6 +2,7 @@
 # 定数定義
 $serverRoot = "C:\rust_server\Server"
 $oxideRoot = Join-Path $serverRoot "rustds\oxide"
+$serverProfileRoot = Join-Path $serverRoot "rustds\server"
 $runScriptPath = Join-Path $serverRoot "Run_DS.bat"
 $profileDir = Join-Path $serverRoot "profiles"
 
@@ -159,6 +160,8 @@ function Save-Profile {
         [string]$profileName
     )
     $profilePath = Join-Path $profileDir $profileName
+    $cfgSourcePath = Join-Path $serverProfileRoot $profileName "cfg"
+    $cfgDestinationPath = Join-Path $profilePath "cfg"
 
     if (-not (Test-Path $profilePath)) {
         Write-Host ($messages.ProfileNotExist -f $profileName)
@@ -171,6 +174,7 @@ function Save-Profile {
     Remove-Item -Recurse -Path (Join-Path $profilePath "data") -Force -ErrorAction SilentlyContinue | Out-Null
     Remove-Item -Recurse -Path (Join-Path $profilePath "lang") -Force -ErrorAction SilentlyContinue | Out-Null
     Remove-Item -Recurse -Path (Join-Path $profilePath "plugins") -Force -ErrorAction SilentlyContinue | Out-Null
+    Remove-Item -Recurse -Path $cfgDestinationPath -Force -ErrorAction SilentlyContinue | Out-Null
 
     # Copy necessary directories
     # 必要なディレクトリをコピー
@@ -178,6 +182,7 @@ function Save-Profile {
     Copy-Item -Recurse -Path (Join-Path $oxideRoot "data") -Destination (Join-Path $profilePath "data") -Force | Out-Null
     Copy-Item -Recurse -Path (Join-Path $oxideRoot "lang") -Destination (Join-Path $profilePath "lang") -Force | Out-Null
     Copy-Item -Recurse -Path (Join-Path $oxideRoot "plugins") -Destination (Join-Path $profilePath "plugins") -Force | Out-Null
+    Copy-Item -Recurse -Path $cfgSourcePath -Destination $cfgDestinationPath -Force | Out-Null
 
     # Copy start script
     # 起動スクリプトをコピー
@@ -193,6 +198,8 @@ function Load-Profile {
         [string]$profileName
     )
     $profilePath = Join-Path $profileDir $profileName
+    $cfgSourcePath = Join-Path $profilePath "cfg"
+    $cfgDestinationPath = Join-Path $serverProfileRoot $profileName "cfg"
 
     if (-not (Test-Path $profilePath)) {
         Write-Host ($messages.ProfileNotExist -f $profileName)
@@ -205,6 +212,7 @@ function Load-Profile {
     Remove-Item -Recurse -Path (Join-Path $oxideRoot "data") -Force -ErrorAction SilentlyContinue | Out-Null
     Remove-Item -Recurse -Path (Join-Path $oxideRoot "lang") -Force -ErrorAction SilentlyContinue | Out-Null
     Remove-Item -Recurse -Path (Join-Path $oxideRoot "plugins") -Force -ErrorAction SilentlyContinue | Out-Null
+    Remove-Item -Recurse -Path $cfgDestinationPath -Force -ErrorAction SilentlyContinue | Out-Null
 
     # Load settings from profile
     # プロファイルから設定をロード
@@ -212,6 +220,7 @@ function Load-Profile {
     Copy-Item -Recurse -Path (Join-Path $profilePath "data") -Destination (Join-Path $oxideRoot "data") -Force | Out-Null
     Copy-Item -Recurse -Path (Join-Path $profilePath "lang") -Destination (Join-Path $oxideRoot "lang") -Force | Out-Null
     Copy-Item -Recurse -Path (Join-Path $profilePath "plugins") -Destination (Join-Path $oxideRoot "plugins") -Force | Out-Null
+    Copy-Item -Recurse -Path $cfgSourcePath -Destination $cfgDestinationPath -Force | Out-Null
 
     # Copy start script
     # 起動スクリプトをコピー
